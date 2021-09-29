@@ -1,23 +1,27 @@
-import logo from './logo.svg';
+import React, { useEffect } from 'react';
 import './App.css';
+import { connectCeloWallet } from './scripts/contract';
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { Navigation, Home, Game, Contact } from "./pages/index";
+import ReactNotification from 'react-notifications-component';
 
 function App() {
+  
+  useEffect(() =>{
+    connectCeloWallet();
+  },[])
+  
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router>
+      <Navigation />
+        <Switch>
+          <Route path="/" exact component={() => <Home />} />
+          <Route path="/games" exact component={() => <Game />} />
+          <Route path="/contact" exact component={() => <Contact />} />
+          <ReactNotification />
+        </Switch>
+      </Router>
     </div>
   );
 }

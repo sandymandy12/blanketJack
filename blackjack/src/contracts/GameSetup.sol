@@ -51,7 +51,8 @@ contract GameSetup {
         address moderator;
         mapping(address => bool) exists;
         mapping(uint => address) players;
-        string name;
+        mapping(uint => Card) deck;
+        uint deckSize;
         uint size;
         bool active;
     }
@@ -66,12 +67,10 @@ contract GameSetup {
     constructor() {
         moderator = msg.sender;
         emit ModSet(address(0), moderator);
-        initializeDeck();
     }
     
-    function createGame(string memory _name) public {
+    function createGame() public {
         
-        idToGameInfo[totalGames].name = _name;
         idToGameInfo[totalGames].moderator = msg.sender; 
         idToGameInfo[totalGames].active = false;
         totalGames++;
@@ -97,6 +96,7 @@ contract GameSetup {
         );
         delete idToGameInfo[_gameId].players[_playerIdx];
         delete idToGameInfo[_gameId].exists[msg.sender];
+        idToGameInfo[_gameId].size--;
     }
 
     /**
@@ -133,13 +133,6 @@ contract GameSetup {
     }
     
     
-    
-    struct Player {
-        address addr;
-        Card[] hand;
-    }
-    
-    
     struct Card {
         address holder;
         string suit;
@@ -153,32 +146,40 @@ contract GameSetup {
     uint deckSize = 0;
     
     
-    function initializeDeck() internal {
-        deckSize = 0;
+    function initializeDeck(uint _gameId) internal {
+        idToGameInfo[_gameId].deckSize = 0;
         for(uint i=0; i<suits.length; i++) {
             for(uint j=0; j<ids.length; j++) {
-                cards[deckSize] = Card (
+                idToGameInfo[_gameId]
+                .deck[idToGameInfo[_gameId]
+                .deckSize] = Card (
                     msg.sender,
-                    suit = suits[i],
-                    index = ids[j]
+                    suits[i],
+                    ids[j]
                 );
-                deckSize++;
+                idToGameInfo[totalGames].deckSize++;
             }
         }
     }
     
-    event Started(Game _game);
+    event Started(uint _gameId);
     
     function startGame(uint _gameId) public isPending(_gameId) {
-        Game newGame = idToGameInfo[_gameId];
         idToGameInfo[_gameId].active = true;
-        
-        emit Started(newGame);
-        
+        initializeDeck(_gameId);
+        emit Started(_gameId);
     }
     
-    function deal(uint _gameId, uint[] _cardId) public isActive {
-        Game game = idToGameInfo[_gameId];
+    // front end will calculate random number within deck size
+    function deal(uint _gameId, uint[] memory _cardId) public isActive(_gameId) {
+        require(
+            idToGameInfo[_gameId].size == _cardId.length
+            ,"number of cards must match game size"
+        );
+        for (uint i=0; i<_cardId.length; i++) {
+            address player = idToGameInfo[_gameId].players[i];
+            idToGameInfo[_gameId].deck[_cardId[i]].holder = player;
+        }
     }
 
 }
