@@ -1,15 +1,10 @@
 import React, { useEffect } from 'react';
 import './App.css';
-import { connectCeloWallet } from './scripts/contract';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Navigation, Home, Game, Contact } from "./pages/index";
 import ReactNotification from 'react-notifications-component';
 
 function App() {
-  
-  useEffect(() =>{
-    connectCeloWallet();
-  },[])
   
   return (
     <div className="App">

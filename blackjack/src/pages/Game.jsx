@@ -1,8 +1,19 @@
 import React from "react";
 import './Nav.css';
+import { Contract } from '../scripts/contract';
 
+const bj = new Contract.default();
+
+const contract = bj.contract;
+
+const call = async
 
 function Games(props) {
+  try {
+    const call = contract.method.
+  } catch (err) {
+    console.log(err)
+  }
   return (
     <div className="game">
       <div class="container">

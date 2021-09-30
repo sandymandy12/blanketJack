@@ -1,21 +1,21 @@
 import { useState, useEffect } from "react";
 import { Link, withRouter } from "react-router-dom";
 import Blockies from "react-blockies";
+const Contract = require('../scripts/contract');
 
-import { getBalance } from '../scripts/contract';
+const address = window.celo.selectedAddress;
+const href = `https://alfajores-blockscout.celo-testnet.org/address/${address}/transactions`;
 
-const blockStyle = {
-  position: 'absolute', top: '50%',
-  transform: 'translate(-50%, -50%)'
-}
-const _address = window.celo.selectedAddress;
-const href = `https://alfajores-blockscout.celo-testnet.org/address/${_address}/transactions`;
+
+const bj = new Contract.default();
 
 function Navigation(props) {
 
   const [balance, setBalance] = useState(0);
-  const updateBalance = async() => {
-    const bal = await getBalance();
+
+  const updateBalance = async () => {
+    const bj = new Contract.default();
+    const bal = await bj.getBalance();
     setBalance(bal);
   }
   useEffect(() => {
@@ -60,7 +60,7 @@ function Navigation(props) {
               <li>
               <button class="nav-link border btn-dark rounded-pill">
                 
-                <span id="balance" >{balance} </span>
+                <span id="balance" href={href}>{balance} </span>
                 cUSD
               </button>
               </li>
