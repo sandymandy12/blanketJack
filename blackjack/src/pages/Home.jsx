@@ -10,7 +10,7 @@ function Home() {
       <div class="container">
         <div class="row align-items-center my-5">
           <div class="col-lg-7">
-            <Link to="/game">
+            <Link to="/games">
               <button color="white" className="border-bottom btn-dark rounded-pill is-rounded" >
                 <span>Join Game</span>
               </button>

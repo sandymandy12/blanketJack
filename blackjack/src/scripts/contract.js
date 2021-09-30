@@ -11,40 +11,46 @@ const gsContractAddress = '0x35C9e79b16C768aFc2caA78837eAFD2B28Bf0305';
 const ERC20_DECIMALS = 18;
 
 
-export default class Contract {
+
+class Contract {
 
   constructor() {
-  
-    this.connectWallet = async () => {
-      console.log("connecting celo..")
-      if (window.celo) {
-        try {
+    
+    const web3 = new Web3(window.celo);
+    this.kit = newKitFromWeb3(web3);
 
-          await window.celo.enable()
-          notification('Celo enabled','success')
-          const web3 = new Web3(window.celo)
-          this.kit = newKitFromWeb3(web3)
-      
-          const accounts = await this.kit.web3.eth.getAccounts();
-          this.kit.defaultAccount = accounts[0];
-      
-          this.contract = new this.kit.web3.eth.Contract(GameSetupAbi, gsContractAddress);
-        } catch (error) {
-          notification(`⚠️ ${error}.`,'danger')
-        }
-      } else {
-        notification("⚠️ Please install the CeloExtensionWallet.", "warning")
-      }
-    }
+    window.celo.enable();
 
+    const accounts = this.kit.web3.eth.getAccounts();
+    this.kit.defaultAccount = accounts[0];
+
+    this.contract = new this.kit.web3.eth.Contract(GameSetupAbi, gsContractAddress);
   }
 
-  async getBalance() {
-    console.log(this.kit);
+  async connectWallet() {
+    console.log("connecting celo..")
+    if (window.celo) {
+      try {
+        
+        await window.celo.enable();
+        // notification('Celo enabled','success');
+
+        const accounts = await this.kit.web3.eth.getAccounts();
+        this.kit.defaultAccount = accounts[0];
+    
+        this.contract = new this.kit.web3.eth.Contract(GameSetupAbi, gsContractAddress);
+      } catch (error) {
+        notification(`⚠️ ${error}.`,'danger')
+      }
+    } else {
+      // notification("⚠️ Please install the CeloExtensionWallet.", "warning")
+    }
+  }
+
+  async balance() {
     const totalBalance = await this.kit.getTotalBalance(this.kit.defaultAccount)
-    console.log(totalBalance)
     const cUSDBalance = totalBalance.cUSD.shiftedBy(-ERC20_DECIMALS).toFixed(2);
-    console.log(cUSDBalance)
+    console.log( 'Balance:', cUSDBalance)
     return cUSDBalance;
   }
 
@@ -54,6 +60,19 @@ export default class Contract {
       .approve(gsContractAddress, _price)
       .send({ from: this.kit.defaultAccount })
     console.log(result);
+  }
+
+  async create(props) {
+    try {
+      const create = await props.contract.methods
+      .createGame()
+      .send({ from: props.kit.defaultAccount })
+  
+      console.log(create);
+    } catch (e) {
+      console.log(e.message)
+    }
+  
   }
 
 }
@@ -75,3 +94,25 @@ function notification(_text, _type, _title="") {
     width: 600
   })
 }
+
+const listGames = async (_contract) => {
+  const totalGames = await _contract.methods
+    .getTotalGames().call();
+
+    const gameInfo = [];
+    for (let i = 0; i < totalGames; i++) {
+      const info = await _contract.methods
+      .getGameInfo(i).call();
+      
+      gameInfo.push({
+        address: info[0],
+        size: info[1],
+        active: info[2],
+        gameId: i
+      });
+    }
+    return { gameInfo: gameInfo, totalGames: totalGames };
+}
+
+
+export { Contract, listGames };

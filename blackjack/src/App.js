@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { Navigation, Home, Game, Contact } from "./pages/index";
+import { Navigation, Home, Game, Contact, Join } from "./pages/index";
 import ReactNotification from 'react-notifications-component';
 
 function App() {
@@ -12,7 +12,8 @@ function App() {
       <Navigation />
         <Switch>
           <Route path="/" exact component={() => <Home />} />
-          <Route path="/games" exact component={() => <Game />} />
+          <Route path="/join" exact component={() => <Join />} />
+          <Route path="/game/:id" exact component={() => <Game />} />          
           <Route path="/contact" exact component={() => <Contact />} />
           <ReactNotification />
         </Switch>

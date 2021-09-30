@@ -1,5 +1,26 @@
-.game {
-    background: url('../images/ace.png');
-    background-size: cover;
-    height: auto;
+
+.game__create {
+    background: 'linear-gradient(45deg, rgba(29, 236, 197, 0.5), rgba(91, 14, 214, 0.5) 100%)';
+}
+
+.card {
+    display: inline-block;
+
+}
+
+.join_button {
+    height: 35px;
+    width: 50px;
+}
+.game__address {
+    color: white;
+    font-size: 12px;
+    width: 300px;
+}
+
+.game__info {
+    color: aqua;
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 15px;
 }

@@ -1,21 +1,19 @@
 import { useState, useEffect } from "react";
 import { Link, withRouter } from "react-router-dom";
-import Blockies from "react-blockies";
-const Contract = require('../scripts/contract');
+import  { Contract } from '../scripts/contract';
 
 const address = window.celo.selectedAddress;
 const href = `https://alfajores-blockscout.celo-testnet.org/address/${address}/transactions`;
 
-
-const bj = new Contract.default();
+const bj = new Contract();
 
 function Navigation(props) {
 
   const [balance, setBalance] = useState(0);
 
   const updateBalance = async () => {
-    const bj = new Contract.default();
-    const bal = await bj.getBalance();
+    await bj.connectWallet();
+    const bal = await bj.balance();
     setBalance(bal);
   }
   useEffect(() => {
@@ -26,7 +24,7 @@ function Navigation(props) {
     <div className="navigation">
       <nav class="navbar navbar-expand navbar-dark bg-dark">
         <div class="container">
-          <Link class="navbar-brand" to="/">
+          <Link class="navbar-brand glow" to="/">
             Blanket Jacket
           </Link>
           
@@ -44,11 +42,11 @@ function Navigation(props) {
               </li>
               <li
                 class={`nav-item  ${
-                  props.location.pathname === "/game" ? "active" : ""
+                  props.location.pathname === "/join" ? "active" : ""
                 }`}
               >
-                <Link class="nav-link" to="/games">
-                  Games
+                <Link class="nav-link" to="/join">
+                  Join
                 </Link>
               </li>
               <li
@@ -72,11 +70,5 @@ function Navigation(props) {
   );
 }
 
-/**
- * 
- * <div class="rounded-circle overflow-hidden d-inline-block border border-white border-2 shadow-sm m-0" >
-                  <Blockies seed={_address} size={6} scale={8} href={href} /> 
-                </div>
- */
 
 export default withRouter(Navigation);
