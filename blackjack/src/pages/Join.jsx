@@ -2,13 +2,10 @@ import React, { useState, useEffect } from "react";
 import './Nav.css';
 import { Contract, listGames } from '../scripts/contract';
 import Blockies from "react-blockies";
-import { useTable } from 'react-table';
+import { Link } from "react-router-dom";
 
-
-const ERC20_DECIMALS = 18;
 
 const bj = new Contract();
-
 
 const blockies = (_address) => {
   const href = `https://alfajores-blockscout.celo-testnet.org/address/${_address}/transactions`;
@@ -19,32 +16,42 @@ const blockies = (_address) => {
   )
 }
 
-const createGame = async () => {
-  bj.connectWallet();
-  await bj.create({
-    contract: bj.contract,
-    kit: bj.kit
-  });
-}
-
 function Join() {
 
+
   const [games, setGames] = useState([])
+  const [buyIn, setBuyIn] = useState(1.00)
 
 
-  useEffect(async () => {
+  const getGameInfo = async () => {
     const g = await listGames(bj.contract);
     setGames(g.gameInfo);
-  })
+  }
 
+  const handleInput = (e)  => {
+    setBuyIn((e.target.value));
+  }
+
+
+  const createGame = async (e) => {
+    console.log(buyIn)
+    await bj.connectWallet();
+    await bj.create(buyIn);
+  }
+
+
+  useEffect(() => {
+    getGameInfo();
+  }, [])
 
   return (
     <div className="game">
       <div class="container">
-        <div className="game__create position-sticky" onClick={createGame}>
-          <button class="nav-link border btn-dark rounded-pill">
-            <span id="create"></span>
-            Create game
+        <div className="game__create position-sticky">
+          <input class='border bg-light' onChange={handleInput} placeholder='Buy in cUSD'>
+          </input>
+          <button class='game__create_form border btn-dark' onClick={createGame}>
+            CREATE GAME  
           </button>
         </div>
         <div class="row align-items-center my-5">
@@ -65,30 +72,34 @@ function Join() {
 
 function gameTemplate(_game) {
   return (
-    <div class="card mb-4 rounded" >
+    <div class="card mb-4 " >
       
       <div className='game__item' class="card-body bg-dark">
         <ul class='list-group list-group-horizontal'>
-          <li className="game__item_block">
+          <div className="game__item_block">
             {blockies(_game.address)}
-          </li>
+          </div>
 
+
+          <span class='game__info text-light' id='gameId'>
+            <p>Game {_game.id}</p>
+          </span>  
 
           <span class='game__info text-light' id='players'>
             <p>Players: {_game.size}</p>
-          </span>  
+          </span> 
           
           <span  class='game__info text-light' id='buyIn' hidden={!_game.active}>
             <p>Buy in: {_game.buyIn}</p>
           </span>
           
 
-          <li class='btn'>
+          <Link to={'/game/' + _game.id}>
             <button class='join_button border btn-dark bg-primary rounded-pill' disabled={_game.active}>
               Join
               <span id='button_value' value={_game.active == false ? "(started)" : ""} />
             </button>
-          </li>
+          </Link>
 
         </ul> 
         

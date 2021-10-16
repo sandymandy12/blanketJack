@@ -1,13 +1,15 @@
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import BigNumber from "bignumber.js"
 import erc20Abi from "../contracts/erc20.abi.json"
 import GameSetupAbi from "../contracts/GameSetup.abi.json"
-
-import { store } from 'react-notifications-component';
+import { notification } from './notification';
+import Bignumber from 'bignumber.js';
+import 'react-notifications-component/dist/theme.css';
 
 const cUSDContractAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"
-const gsContractAddress = '0x35C9e79b16C768aFc2caA78837eAFD2B28Bf0305'; 
+// const gsContractAddress = '0x35C9e79b16C768aFc2caA78837eAFD2B28Bf0305'; 
+
+const gsContractAddress = '0xc9a8568c355223d9dEB15b850379C5934606a6FA';
 const ERC20_DECIMALS = 18;
 
 
@@ -43,7 +45,7 @@ class Contract {
         notification(`⚠️ ${error}.`,'danger')
       }
     } else {
-      // notification("⚠️ Please install the CeloExtensionWallet.", "warning")
+      notification("⚠️ Please install the CeloExtensionWallet.", "warning")
     }
   }
 
@@ -55,45 +57,122 @@ class Contract {
   }
 
   async approve(_price) {
+    const price = new Bignumber(_price).shiftedBy(ERC20_DECIMALS);
     const cUSDContract = new this.kit.web3.eth.Contract(erc20Abi, cUSDContractAddress)
     const result = await cUSDContract.methods
-      .approve(gsContractAddress, _price)
+      .approve(gsContractAddress, price)
       .send({ from: this.kit.defaultAccount })
     console.log(result);
   }
 
-  async create(props) {
+  async create(_buyIn) {
+    let buyIn = new Bignumber(_buyIn).shiftedBy(ERC20_DECIMALS);
+
+    console.log(buyIn);
     try {
-      const create = await props.contract.methods
+      const create = await this.contract.methods
       .createGame()
-      .send({ from: props.kit.defaultAccount })
+      .send({ from: this.kit.defaultAccount })
   
       console.log(create);
-    } catch (e) {
-      console.log(e.message)
+    } catch (e) {      
+      notification(e.message, "warning",)
+      console.log(e.message);
     }
   
   }
 
+  async join(_id) {
+
+
+    try {
+
+      const result = await this.contract.methods
+      .joinGame(_id)
+      .send({ from: this.kit.defaultAccount })
+
+      console.log(result)
+      
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
+
+  async start(_id) {
+    
+    try {
+      const result = await this.contract.methods
+      .startGame(_id)
+      .send({ from: this.kit.defaultAccount });
+
+      console.log(result);   
+
+    } catch (e) {
+      console.log(e.message)
+    }
+
+  }
+
+  async deal(_id, _size) {
+
+    
+
+    const cards = [];
+
+    let added = 0;
+    
+    while(added < _size) {
+
+      const random = rng(1,52);
+
+      if (!cards.includes(random)) {
+        cards.push(random);
+        added++;
+      }
+
+    }
+
+    console.log(cards);
+
+    try {
+
+    } catch (e) {
+      console.log(e.message);
+    }
+    
+  }
+
+  /**
+   * 
+   * @param {Game ID} _gameId 
+   * @param {Player Index} _playerIdx 
+   * @returns Player address at index
+   */
+  async player(_gameId, _playerIdx) {
+    try {
+      const result = await this.contract.methods
+      .getPlayer(_gameId, _playerIdx)
+
+      return result;
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
+
 }
 
-function notification(_text, _type, _title="") {
-  store.addNotification({
-    title: _title,
-    message: _text,
-    type: _type,
-    container: 'top-right',
-    insert: 'top',
-    animationIn: ['animated', 'fadeIn'],
-    animationOut: ['animated', 'fadeOut'],
-
-    dismiss: {
-      duration: 4000,
-      showIcon: true
-    },
-    width: 600
-  })
+const gameInfo = async (_contract,_id) => {
+  const result = await _contract.methods
+  .getGameInfo(_id).call();
+  console.debug('Game info called', result);
+  return {
+    moderator: result[0],
+    size: result[1],
+    buyIn: result[2],
+    active: result[3]
+  };
 }
+
 
 const listGames = async (_contract) => {
   const totalGames = await _contract.methods
@@ -105,14 +184,19 @@ const listGames = async (_contract) => {
       .getGameInfo(i).call();
       
       gameInfo.push({
-        address: info[0],
+        moderator: info[0],
         size: info[1],
-        active: info[2],
-        gameId: i
+        buyIn: info[2],
+        active: info[3],
+        id: i
       });
     }
-    return { gameInfo: gameInfo, totalGames: totalGames };
+  return { gameInfo: gameInfo, totalGames: totalGames };
+}
+
+function rng(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
 
-export { Contract, listGames };
+export { Contract, listGames, gameInfo };

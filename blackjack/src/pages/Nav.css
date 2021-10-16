@@ -3,6 +3,19 @@
     background: 'linear-gradient(45deg, rgba(29, 236, 197, 0.5), rgba(91, 14, 214, 0.5) 100%)';
 }
 
+.game__create_form {
+    width: 300px;
+}
+
+.game__item {
+    display: inline-block;
+}
+
+.game__started {
+    color: white;
+}
+
+
 .card {
     display: inline-block;
 
@@ -23,4 +36,5 @@
     margin-left: 10px;
     margin-right: 10px;
     font-size: 15px;
+    display: flex;
 }

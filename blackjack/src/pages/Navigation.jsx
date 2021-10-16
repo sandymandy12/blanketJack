@@ -25,7 +25,7 @@ function Navigation(props) {
       <nav class="navbar navbar-expand navbar-dark bg-dark">
         <div class="container">
           <Link class="navbar-brand glow" to="/">
-            Blanket Jacket
+            Blakjet
           </Link>
           
           <div>
@@ -57,7 +57,6 @@ function Navigation(props) {
               </li>
               <li>
               <button class="nav-link border btn-dark rounded-pill">
-                
                 <span id="balance" href={href}>{balance} </span>
                 cUSD
               </button>

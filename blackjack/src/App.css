@@ -3,9 +3,10 @@
 .App {
   text-align: center;
   background: url('./images/ace.png');
-  background-size: auto;
+  background-size: cover;
   height: auto;
   font-family: Fantasy;
+  display:flexbox;
 }
 
 .App-logo {
