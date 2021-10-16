@@ -19,27 +19,52 @@ interface IERC20Token {
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-contract GameSetup {
-    
-    uint public time;
+contract Game {
     
     address admin;
     
     address[] public players;
+    address[] public winners;
     
     uint public minimumBet;
+    mapping(address => bool) paid; 
+    
+    modifier isPlayer {
+        bool involved = false;
+        for (uint p = 0; p < players.length; p++) {
+            if(players[p] == msg.sender) {
+                involved = true;
+            }
+        }
+        
+        require(involved == true, 'address not involved');
+        _;
+    }
+    modifier isWinner {
+        bool winner = false;
+        for (uint p = 0; p < winners.length; p++) {
+            if(winners[p] == msg.sender) {
+                winner = true;
+            }
+        }
+        
+        require(winner == true, 'not a winner');
+        _;
+    }
     
     struct Card {
         address holder;
-        string suit;
-        string index;
+        uint suit;
+        uint index;
     }
+    
     mapping(address => Card[]) deck;
     mapping(address => uint) bets;
+    mapping(string => bool) used;
+    
 
     constructor() {
         admin = msg.sender;
-        time = block.timestamp;
     }
     
     function addPlayer(address _addr) public {
@@ -71,56 +96,74 @@ contract GameSetup {
         minimumBet = _amount;
     }
     
-    function addCard(address player, string memory suit, string memory index) public {
+    function addCard(address player, uint suit, uint index) public {
         Card memory card = Card(player, suit, index);
+        require(deck[player].length < 2, 'hand is full');
         deck[player].push(card);
+        used[string(abi.encodePacked(suit, index))] = true;
     }
     
     function getPlayer(uint _idx) public view returns(address) {
         return players[_idx];
     }
-
-
+    
+    function isUsed(string memory _card) public view returns(bool) {
+        return used[_card];
+    }
+    
+    function getHand(address _addr) public view returns (Card[] memory) {
+        return deck[_addr];
+    }
+    
+    function setWinner(address _addr) public {
+        bool added = false;
+        for (uint w=0; w < winners.length; w++) {
+            if(winners[w] == _addr) {
+                added = true;
+            }
+        }
+        
+        require(added = false, "already added");
+        winners.push(_addr);
+    }
+    
+    function getWinner() public view returns(address[] memory) {
+        return winners;
+    }
+    
+    function alreadyPaid(address _addr) public view returns(bool) {
+        return paid[_addr];
+    }
+    
+    function setPaid() public isWinner {
+        paid[msg.sender] = true;
+    }
 }
 
 /**
  * @title Blackjack
- * @dev Store & retrieve value in a variable
  */
-contract Blackjack {
+contract Blackjack is Game {
     
     
+    uint suits = 4;
+    uint ids = 13;
     
-    GameSetup internal game;
-    
-    
-    string[] suits = ['clubs','diamonds','spades','hearts'];
-    string[] ids = ['ace','2','3','4','5','6','7','8','9','10','jack','queen','king'];
-    
-    struct Card {
-        address holder;
-        string suit;
-        string index;
-    }
-    
-    
-    mapping(uint => Card) deck;
-    mapping(uint => GameSetup) games;
+    mapping(uint => Game) games;
+    mapping(uint => Card) allCards;
     uint totalGames = 0;
-    
-    address internal setupAddress;
     
     constructor() {
     
         
         uint deckSize = 0;
         
-        for(uint suit=0; suit<suits.length; suit++) {
-            for(uint id=0; id<ids.length; id++) {
-                deck[deckSize] = Card(
-                    msg.sender,
-                    suits[suit],
-                    ids[id]
+        for(uint suit=0; suit<suits; suit++) {
+            for(uint id=0; id<ids; id++) {
+                allCards[deckSize] = Card(
+                    address(0),
+                    suit,
+                    id
                 );
                 deckSize++;
             }
@@ -128,11 +171,10 @@ contract Blackjack {
     
     }
     
-    function getGameInfo(uint _gameIdx) public returns(uint[3] memory){
-        game = games[_gameIdx];
-        uint total = game.totalBets();
-        uint size = game.size();
-        uint min = game.minimumBet();
+    function getGameInfo(uint _gameIdx) public view returns(uint[3] memory){
+        uint total = games[_gameIdx].totalBets();
+        uint size = games[_gameIdx].size();
+        uint min = games[_gameIdx].minimumBet();
         
         return [total, size, min];
         
@@ -141,32 +183,9 @@ contract Blackjack {
         return totalGames;
     }
     
-    mapping(uint => uint) timestamps; 
-    mapping(uint => GameSetup) testContracts; // should return different timestamps per
-    uint len = 0;
-    
-    
-    
-    
-    function stamp() public returns(uint){
-        GameSetup test = new GameSetup();
-        
-        testContracts[len] = test;
-        timestamps[len] = test.time();
-        
-        return testContracts[len].time();
-    }
-    
-    function getStamp(uint id) public view returns(uint, uint) {
-        return(
-            testContracts[id].time(),
-            timestamps[id]
-        );
-    }
-    
     function create() public {
         
-        games[totalGames] = new GameSetup();
+        games[totalGames] = new Game();
         totalGames++;
     }
     
@@ -174,18 +193,17 @@ contract Blackjack {
         return games[gameIdx].getBet(player);
     }
     
-    function minimumBet(uint gameIdx) public view returns(uint) {
+    function getBuyIn(uint gameIdx) public view returns(uint) {
         return games[gameIdx].minimumBet();
     }
     
     function join(uint gameIdx) public payable {
-        game = games[gameIdx];
-        
-        if(game.size() == 0) {
+
+        if(games[gameIdx].size() == 0) {
             games[gameIdx].setMinimumBet(msg.value);
         }
         
-        require(msg.value >= game.minimumBet(), "bet not enough");
+        require(msg.value >= games[gameIdx].minimumBet(), "bet not enough");
         
         games[gameIdx].addPlayer(msg.sender);
         games[gameIdx].setBet(msg.sender, msg.value);
@@ -194,31 +212,107 @@ contract Blackjack {
     
     function start(uint gameIdx) public {
         
-
-        game = games[gameIdx];
+        require(games[gameIdx].size() > 0, 'not enough players');
         
-        require(game.size() > 0, 'not enough players');
-        
-        for (uint player=0; player<game.size(); player++) {
-            uint cardIdx = uint(keccak256(abi.encodePacked(block.timestamp, block.difficulty, msg.sender))) % 52;
+        for (uint player = 0; player < games[gameIdx].size(); player++) {
             
-            Card memory card = deck[cardIdx];
-            address addr = game.getPlayer(player);
-            games[gameIdx].addCard(addr, card.suit, card.index);
+            address addr = games[gameIdx].getPlayer(player);
+
+            Card memory card = dealCard(gameIdx);
+            games[gameIdx].addCard(addr, card.suit, card.index); // 0 is the suit, 1 is the id value
+            
             
         }
         
+        
 
     }
     
-    function bet(uint gameIdx) public {
+    function deal(uint gameIdx) public returns(address[] memory) {
+    
+        Game game = games[gameIdx];
         
-        game = games[gameIdx];
+        uint highest = 0;
         
+        // dealing last card
+        for (uint p = 0; p < games[gameIdx].size(); p++) {
+    
+            address player = game.getPlayer(p);
+            Card memory lastCard = dealCard(gameIdx);
+            game.addCard(player, lastCard.suit, lastCard.index);
+            
+            Card[] memory hand = game.getHand(player);
+            uint value = handValue(hand);
+            
+            if (value >= highest) {
+                highest = value;
+                games[gameIdx].setWinner(player);
+            }
+            
+        }
+        
+        games[gameIdx] = game;
+        
+        return(games[gameIdx].getWinner());
         
         
     }
     
+    function payout(uint gameIdx) external payable isWinner {
+        Game game = games[gameIdx];
+        
+        require(game.alreadyPaid(msg.sender) == false,
+            'player already paid out'
+        );
+        
+        address[] memory w = game.getWinner();
+        
+        uint amount = game.totalBets() / w.length;
+        
+        payable(msg.sender).transfer(amount);
+        
+        game.setPaid();
+        
+        games[gameIdx] = game;        
+    }
+    
+    function handValue(Card[] memory hand) internal view returns (uint) {
+        uint suit_value = 0;
+        uint index_value = 0;
+        
+
+        for (uint suit = 0; suit < suits; suit++) {
+            if ( hand[0].suit == suit || hand[1].suit == suit) {
+                suit_value += suit;
+            }
+        }
+        
+        for (uint index = 0; index < ids; index++) {
+           if (hand[0].index == ids || hand[1].index == ids) {
+                index_value += index;
+           }
+        }
+        
+
+        return (suit_value + index_value);
+        
+        
+    }
+    
+    function dealCard(uint gameIdx) internal view returns (Card memory) {
+        
+        bool dealt = true;
+        Card memory card;
+
+        while(dealt) {
+            uint cardIdx = uint(keccak256(abi.encodePacked(block.timestamp, block.difficulty, msg.sender))) % 52;
+            card = allCards[cardIdx];
+            dealt = games[gameIdx].isUsed(string(abi.encodePacked(card.suit, card.index)));
+        }
+        
+        return card;
+        
+    }
     
     
 }
