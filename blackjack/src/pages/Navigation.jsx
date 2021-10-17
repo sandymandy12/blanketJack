@@ -3,8 +3,8 @@ import { Link, withRouter } from "react-router-dom";
 import  { Contract } from '../scripts/contract';
 
 
-
-const bj = new Contract();
+let network = parseInt(window.ethereum.chainId, 16);
+const bj = new Contract(network);
 const address = bj.address;
 const href = `https://alfajores-blockscout.celo-testnet.org/address/${address}/transactions`;
 

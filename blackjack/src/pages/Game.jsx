@@ -4,8 +4,8 @@ import { useParams } from "react-router";
 import { Contract } from '../scripts/contract';
 // import Blockies from "react-blockies";
 
-
-const bj = new Contract();
+let network = parseInt(window.ethereum.chainId, 16);
+const bj = new Contract(network);
 
 function Game(props) {
 

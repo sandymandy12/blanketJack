@@ -1,21 +1,49 @@
 import { store } from 'react-notifications-component';
 
-function notification(_text, _type, _title="") {
-    store.addNotification({
-        title: _title,
-        message: _text,
-        type: _type,
-        container: 'top-right',
-        insert: 'top',
-        animationIn: ['animated', 'fadeIn'],
-        animationOut: ['animated', 'fadeOut'],
+export class Notification {
 
-        dismiss: {
-        duration: 4000,
-        showIcon: true
-        },
-        width: 200
-    })
+    constructor() {
+        this.ids = [];
+    }
+    add(n) {
+
+        const notification = {
+            title: n.id,
+            message: n.text,
+            type: n.type,
+            container: 'top-right',
+            insert: 'top',
+            animationIn: ['animated', 'fadeIn'],
+            animationOut: ['animated', 'fadeOut'],
+            width: 200
+        }
+
+        let removal = [];
+        if (n.timer) {
+            removal = {
+                dismiss: {
+                    duration: 4000,
+                    showIcon: true
+                }
+            }
+        } else {
+            removal = {
+
+            }
+        }
+        
+        store.addNotification({
+            notification,
+            removal
+        })
+
+        this.ids.push(n.id);
+
+    }
+
+    remove(_id) {
+        store.removeNotification(_id)
+        const idx = this.ids.indexOf(_id);
+        this.ids.pop(idx);
+    }
 }
-
-export { notification };

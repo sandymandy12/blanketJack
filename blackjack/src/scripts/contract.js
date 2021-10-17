@@ -1,20 +1,23 @@
 import { ethers } from 'ethers';
-import { notification } from './notification';
-import { Addresses as addy, } from './constants';
+import { Notification } from './notification';
+import { Addresses as addy } from './constants';
 import Bignumber from 'bignumber.js';
 import 'react-notifications-component/dist/theme.css';
 
 const BlackJackABi = require('../contracts/BlackJack.abi.json');
 
-const chain = parseInt(window.ethereum.chainId, 16);
-const bjAddress = addy[chain].contract;
 const ERC20_DECIMALS = 18;
+const notify = new Notification();
 
 
 class Contract {
 
-  constructor() {
+  constructor(network) {
+
+    console.log(network);
     
+    const bjAddress = addy[network].contract;
+
     this.provider = new ethers.providers.Web3Provider(window.ethereum);
     this.signer = this.provider.getSigner();
     this.contract = new ethers.Contract(
@@ -43,13 +46,17 @@ class Contract {
     try {
 
       const create = await this.contract.create();
-      console.log(this.contract)
-      console.log(create);
+      console.assert(create);
+      notify.add({
+        text:'Creating contract',
+        type:'success',
+        id:'create-'+ String(Date.now())
+      });
       console.log('done')
 
     } catch (e) {      
       
-      notification(e.message, "warning",)
+      notify.add({text: e.message, type: 'danger', id:''})
       console.log(e.message);
     }
   
@@ -160,6 +167,7 @@ class Contract {
       minimumBet: toToken(result[2]),
       balance: toNumber(result[3]),
       admin: (result[4]),
+      id: _id
     };
   }
 

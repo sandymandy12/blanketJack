@@ -5,9 +5,10 @@ import { Explorer } from '../scripts/constants';
 import Blockies from "react-blockies";
 import { Link } from "react-router-dom";
 
+let network = parseInt(window.ethereum.chainId, 16);
+console.log('network', network)
+const bj = new Contract(network);
 
-const bj = new Contract();
-const network = parseInt(window.ethereum.chainId);
 
 const blockies = (_network, _address) => {
   const href = Explorer(_network, _address);
@@ -27,9 +28,7 @@ function Join() {
 
   const getGameInfo = async () => {
     const info = await bj.listGames();
-
     setTotal(info.totalGames);
-    console.log(info.gameInfo)
     setGames(info.gameInfo);
   }
 
@@ -80,7 +79,7 @@ function gameTemplate(_game) {
       <div className='game__item' class="card-body bg-dark">
         <ul class='list-group list-group-horizontal'>
           <div className="game__item_block">
-            {blockies(_game.address)}
+            {blockies(network,_game.address)}
           </div>
 
 
