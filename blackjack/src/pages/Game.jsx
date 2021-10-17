@@ -1,9 +1,8 @@
 import './Nav.css';
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
-// import { StyleSheet, View } from 'react-native';
-import { Contract, gameInfo } from '../scripts/contract';
-import Blockies from "react-blockies";
+import { Contract } from '../scripts/contract';
+// import Blockies from "react-blockies";
 
 
 const bj = new Contract();
@@ -17,8 +16,7 @@ function Game(props) {
     const [players, setPlayers] = useState();
 
     const getGameInfo = async () => {
-        await bj.connectWallet();
-        const result = await gameInfo(bj.contract, id);
+        const result = await bj.gameInfo(id);
         setInfo(result);
         console.log('Game info',info);
     }
@@ -69,12 +67,12 @@ function Game(props) {
         <div class='game__start' id={info.id}>
             <button class='game_button border btn-dark bg-primary ' onClick={join} hidden={gameState!=='open'}>
               Join
-              <span id='button_value'>{info.active == true ? "(started)" : ""}</span>
+              <span id='button_value'>{info.active === true ? "(started)" : ""}</span>
             </button>
 
             <button class='game_button border btn-dark bg-primary' onClick={start} hidden={gameState!=='open'}>
               Start
-              <span id='button_value'>{info.active == true ? "(started)" : ""}</span>
+              <span id='button_value'>{info.active === true ? "(started)" : ""}</span>
             </button>
 
             <button class='game_button border btn-dark bg-primary' onClick={deal} hidden={gameState!=='started'}>

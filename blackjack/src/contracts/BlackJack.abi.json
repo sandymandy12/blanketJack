@@ -1,62 +1,15 @@
 [
 	{
-		"inputs": [],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "player",
-				"type": "address"
-			},
-			{
 				"internalType": "uint256",
-				"name": "suit",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "index",
+				"name": "_gameIdx",
 				"type": "uint256"
 			}
 		],
-		"name": "addCard",
+		"name": "bet",
 		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_addr",
-				"type": "address"
-			}
-		],
-		"name": "addPlayer",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_addr",
-				"type": "address"
-			}
-		],
-		"name": "alreadyPaid",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -70,18 +23,12 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "gameIdx",
+				"name": "_gameIdx",
 				"type": "uint256"
 			}
 		],
 		"name": "deal",
-		"outputs": [
-			{
-				"internalType": "address[]",
-				"name": "",
-				"type": "address[]"
-			}
-		],
+		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
@@ -89,40 +36,36 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "gameIdx",
+				"name": "_gameIdx",
+				"type": "uint256"
+			}
+		],
+		"name": "gameInfo",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "_totalBets",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_size",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_minimumBet",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_balance",
 				"type": "uint256"
 			},
 			{
 				"internalType": "address",
-				"name": "player",
+				"name": "_admin",
 				"type": "address"
-			}
-		],
-		"name": "getBet",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_addr",
-				"type": "address"
-			}
-		],
-		"name": "getBet",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -132,15 +75,105 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "gameIdx",
+				"name": "_gameIdx",
 				"type": "uint256"
 			}
 		],
-		"name": "getBuyIn",
+		"name": "hand",
+		"outputs": [
+			{
+				"internalType": "uint256[2]",
+				"name": "",
+				"type": "uint256[2]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_gameIdx",
+				"type": "uint256"
+			}
+		],
+		"name": "join",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_gameIdx",
+				"type": "uint256"
+			}
+		],
+		"name": "payout",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_gameIdx",
+				"type": "uint256"
+			}
+		],
+		"name": "players",
+		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "_players",
+				"type": "address[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_gameIdx",
+				"type": "uint256"
+			}
+		],
+		"name": "start",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_gameIdx",
+				"type": "uint256"
+			}
+		],
+		"name": "status",
+		"outputs": [
+			{
+				"internalType": "enum Setup.Status",
+				"name": "_status",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalGames",
 		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "_games",
 				"type": "uint256"
 			}
 		],
@@ -155,26 +188,7 @@
 				"type": "uint256"
 			}
 		],
-		"name": "getGameInfo",
-		"outputs": [
-			{
-				"internalType": "uint256[3]",
-				"name": "",
-				"type": "uint256[3]"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_addr",
-				"type": "address"
-			}
-		],
-		"name": "getHand",
+		"name": "winner",
 		"outputs": [
 			{
 				"components": [
@@ -194,243 +208,12 @@
 						"type": "uint256"
 					}
 				],
-				"internalType": "struct Game.Card[]",
+				"internalType": "struct Setup.Card[]",
 				"name": "",
 				"type": "tuple[]"
 			}
 		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_idx",
-				"type": "uint256"
-			}
-		],
-		"name": "getPlayer",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getTotalGames",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getWinner",
-		"outputs": [
-			{
-				"internalType": "address[]",
-				"name": "",
-				"type": "address[]"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_card",
-				"type": "string"
-			}
-		],
-		"name": "isUsed",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "gameIdx",
-				"type": "uint256"
-			}
-		],
-		"name": "join",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "minimumBet",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "gameIdx",
-				"type": "uint256"
-			}
-		],
-		"name": "payout",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "players",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_addr",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_bet",
-				"type": "uint256"
-			}
-		],
-		"name": "setBet",
-		"outputs": [],
 		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_amount",
-				"type": "uint256"
-			}
-		],
-		"name": "setMinimumBet",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "setPaid",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_addr",
-				"type": "address"
-			}
-		],
-		"name": "setWinner",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "size",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "gameIdx",
-				"type": "uint256"
-			}
-		],
-		"name": "start",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "totalBets",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "winners",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
 		"type": "function"
 	}
 ]

@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import { Link, withRouter } from "react-router-dom";
 import  { Contract } from '../scripts/contract';
 
-const address = window.celo.selectedAddress;
-const href = `https://alfajores-blockscout.celo-testnet.org/address/${address}/transactions`;
+
 
 const bj = new Contract();
+const address = bj.address;
+const href = `https://alfajores-blockscout.celo-testnet.org/address/${address}/transactions`;
 
 function Navigation(props) {
 
   const [balance, setBalance] = useState(0);
 
   const updateBalance = async () => {
-    await bj.connectWallet();
     const bal = await bj.balance();
     setBalance(bal);
   }

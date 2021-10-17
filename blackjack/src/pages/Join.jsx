@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import './Nav.css';
-import { Contract, listGames } from '../scripts/contract';
+import { Contract } from '../scripts/contract';
 import Blockies from "react-blockies";
 import { Link } from "react-router-dom";
 
@@ -18,14 +18,20 @@ const blockies = (_address) => {
 
 function Join() {
 
-
-  const [games, setGames] = useState([])
-  const [buyIn, setBuyIn] = useState(1.00)
+  const [total, setTotal] = useState(0);
+  const [games, setGames] = useState([]);
+  const [buyIn, setBuyIn] = useState(1.00);
 
 
   const getGameInfo = async () => {
-    const g = await listGames(bj.contract);
-    setGames(g.gameInfo);
+    const t = await bj.total();
+    const info = await bj.listGames();
+
+    setTotal(t);
+
+    console.log(t)
+
+    setGames(info);
   }
 
   const handleInput = (e)  => {
@@ -34,10 +40,9 @@ function Join() {
 
 
   const createGame = async (e) => {
-    console.log(buyIn)
-    await bj.connectWallet();
-    await bj.create(buyIn);
+    await bj.create();
   }
+
 
 
   useEffect(() => {
@@ -48,10 +53,9 @@ function Join() {
     <div className="game">
       <div class="container">
         <div className="game__create position-sticky">
-          <input class='border bg-light' onChange={handleInput} placeholder='Buy in cUSD'>
-          </input>
+          
           <button class='game__create_form border btn-dark' onClick={createGame}>
-            CREATE GAME  
+            CREATE GAME ({total} total)
           </button>
         </div>
         <div class="row align-items-center my-5">
