@@ -6,9 +6,7 @@ import Blockies from "react-blockies";
 import { Link } from "react-router-dom";
 
 let network = parseInt(window.ethereum.chainId, 16);
-console.log('network', network)
 const bj = new Contract(network);
-
 
 const blockies = (_network, _address) => {
   const href = Explorer(_network, _address);

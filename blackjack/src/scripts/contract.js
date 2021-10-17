@@ -13,10 +13,10 @@ const notify = new Notification();
 class Contract {
 
   constructor(network) {
+    console.log('network - contract', network);
 
-    console.log(network);
-    
-    const bjAddress = addy[network].contract;
+    const chain = 3; // wanted to use network but its being a dickhead
+    const bjAddress = addy[chain].contract;
 
     this.provider = new ethers.providers.Web3Provider(window.ethereum);
     this.signer = this.provider.getSigner();
@@ -46,17 +46,26 @@ class Contract {
     try {
 
       const create = await this.contract.create();
-      console.assert(create);
+      console.log(create, 'before')
+      const hash = await create.hash;
+      console.log(create, 'after');
+
+      const title = 'create-'+ String(Date.now());
+      const id = String(hash) + String(Date.now());
+
       notify.add({
-        text:'Creating contract',
+        text:'Creating contract\n' + String(hash),
         type:'success',
-        id:'create-'+ String(Date.now())
+        id: id + hash,
+        title: title
+
       });
+
       console.log('done')
 
     } catch (e) {      
       
-      notify.add({text: e.message, type: 'danger', id:''})
+      notify.add({text: e.message, type: 'danger', title:'error'})
       console.log(e.message);
     }
   

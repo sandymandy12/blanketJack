@@ -7,8 +7,8 @@ export class Notification {
     }
     add(n) {
 
-        const notification = {
-            title: n.id,
+        let notification = {
+            title: n.title,
             message: n.text,
             type: n.type,
             container: 'top-right',
@@ -18,26 +18,20 @@ export class Notification {
             width: 200
         }
 
-        let removal = [];
         if (n.timer) {
-            removal = {
-                dismiss: {
-                    duration: 4000,
-                    showIcon: true
-                }
+            notification.dismiss = {
+                duration: 4000,
+                showIcon: true
             }
-        } else {
-            removal = {
-
-            }
-        }
+        } 
         
-        store.addNotification({
-            notification,
-            removal
-        })
+        store.addNotification(
+            notification
+        )
 
+       if (n.id) {
         this.ids.push(n.id);
+       }
 
     }
 
