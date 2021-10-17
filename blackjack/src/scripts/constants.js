@@ -1,5 +1,6 @@
-export const Addresses = {
+const Addresses = {
   137: {
+    contract: '',
     name: 'Matic Mainnet',
     dai: ['0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
       18, 'DAI', 'Dai Stable Coin',
@@ -33,4 +34,21 @@ export const Addresses = {
     weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
     busd: '0x4fabb145d64652a948d72533023f6e7a623c7c53',
   },
+  3: {
+    contract: '0x79fA1F10Bc50150f08e86D5E923ee26571935fCA'
+  }
 };
+
+const Explorer = (network, addr) => {
+  const networks = {
+    1: `https://etherscan.io/address/${addr}`,
+    137: `https://polygonscan.com/address${addr}`,
+    3: `https://ropsten.etherscan.io/address/${addr}`,
+    80001: `https://mumbai.polygonscan.com/address/${addr}`
+  }
+
+  return networks[network];
+}
+
+
+export { Addresses, Explorer }

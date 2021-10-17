@@ -1,13 +1,13 @@
 import { ethers } from 'ethers';
 import { notification } from './notification';
-import { Addresses as addy } from './constants';
+import { Addresses as addy, } from './constants';
 import Bignumber from 'bignumber.js';
 import 'react-notifications-component/dist/theme.css';
 
 const BlackJackABi = require('../contracts/BlackJack.abi.json');
 
-//const bjAddress = '0xd9145CCE52D386f254917e481eB44e9943F39138';
-const bjAddress = '0x79fA1F10Bc50150f08e86D5E923ee26571935fCA';
+const chain = parseInt(window.ethereum.chainId, 16);
+const bjAddress = addy[chain].contract;
 const ERC20_DECIMALS = 18;
 
 
@@ -22,16 +22,18 @@ class Contract {
       BlackJackABi,
       this.signer
     );
-
     this.address = ethers.utils.getAddress(window.ethereum.selectedAddress);
     
   }
 
 
   async balance() {
+    const test = await this.provider.getNetwork();
     const balance = await this.provider.getBalance(this.address);
-    console.log('balance', balance)
-    return balance;
+    const bn = new Bignumber(balance.toString())
+    .shiftedBy(-ERC20_DECIMALS)
+    .toFixed(4);
+    return { balance: bn, network: test.name }
   }
 
 
@@ -40,15 +42,13 @@ class Contract {
     console.log('creating')
     try {
 
-      // const create = await this.contract.create();
-      // const t = await this.contract.getTotalGames();
-      // console.log('are we here')
+      const create = await this.contract.create();
       console.log(this.contract)
-      // console.log(create);
+      console.log(create);
       console.log('done')
 
     } catch (e) {      
-
+      
       notification(e.message, "warning",)
       console.log(e.message);
     }
@@ -128,7 +128,8 @@ class Contract {
 
   async total() {
     try {
-      const t = await this.contract.getTotalGames();
+      const res = await this.contract.totalGames();
+      const t = new Bignumber(String(res)).toNumber();
       return t;
     } catch (e) {
       console.log(e.message);
@@ -137,31 +138,28 @@ class Contract {
 
 
   async listGames() {
-    const totalGames = await this.contract.getTotalGames();
+    const totalGames = await this.total();
 
     const gameInfo = [];
 
     for (let i = 0; i < totalGames; i++) {
-      const info = await this.contract.getGameInfo(i);
       
-      gameInfo.push({
-        moderator: info[0],
-        size: info[1],
-        buyIn: info[2],
-        active: info[3],
-        id: i
-      });
+      const info = await this.gameInfo(i);
+      gameInfo.push(info);
+      
     }
     return { gameInfo: gameInfo, totalGames: totalGames };
   }
+
   async gameInfo(_id) {
-    const result = await this.contract.getGameInfo(_id);
-    console.debug('Game info called', result);
+    let result = await this.contract.gameInfo(_id);
+    console.assert('Game info called', result);
     return {
-      moderator: result[0],
-      size: result[1],
-      buyIn: result[2],
-      active: result[3]
+      totalBets: toToken(result[0]),
+      size: toNumber(result[1]),
+      minimumBet: toToken(result[2]),
+      balance: toNumber(result[3]),
+      admin: (result[4]),
     };
   }
 
@@ -172,5 +170,18 @@ function rng(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
+function toNumber(_bignumber) {
+  return new Bignumber(String( _bignumber )).toNumber();
+}
+
+function toAddress(_bignumber) {
+  return new Bignumber(String( _bignumber )).toString();
+}
+
+function toToken(_bignumber) {
+  return new Bignumber(String( _bignumber))
+  .shiftedBy(-ERC20_DECIMALS)
+  .toFixed(6);
+}
 
 export { Contract };

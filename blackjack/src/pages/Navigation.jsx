@@ -10,7 +10,7 @@ const href = `https://alfajores-blockscout.celo-testnet.org/address/${address}/t
 
 function Navigation(props) {
 
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState([]);
 
   const updateBalance = async () => {
     const bal = await bj.balance();
@@ -18,14 +18,14 @@ function Navigation(props) {
   }
   useEffect(() => {
     updateBalance();
-  },[balance])
+  },[])
 
   return (
     <div className="navigation">
       <nav class="navbar navbar-expand navbar-dark bg-dark">
         <div class="container">
           <Link class="navbar-brand glow" to="/">
-            Blakjet
+            BlackJack
           </Link>
           
           <div>
@@ -57,8 +57,8 @@ function Navigation(props) {
               </li>
               <li>
               <button class="nav-link border btn-dark rounded-pill">
-                <span id="balance" href={href}>{balance} </span>
-                cUSD
+                <span id="balance" href={href}>{balance.balance} </span>
+                [ {String(balance.network).toUpperCase()} ]
               </button>
               </li>
             </ul>

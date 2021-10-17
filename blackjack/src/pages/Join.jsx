@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import './Nav.css';
 import { Contract } from '../scripts/contract';
+import { Explorer } from '../scripts/constants';
 import Blockies from "react-blockies";
 import { Link } from "react-router-dom";
 
 
 const bj = new Contract();
+const network = parseInt(window.ethereum.chainId);
 
-const blockies = (_address) => {
-  const href = `https://alfajores-blockscout.celo-testnet.org/address/${_address}/transactions`;
+const blockies = (_network, _address) => {
+  const href = Explorer(_network, _address);
   return(
     <a class="rounded-circle overflow-hidden d-inline-block border border-white border-2 shadow-sm m-0" href={href}>
       <Blockies seed={_address} size={8} scale={8} /> 
@@ -24,14 +26,11 @@ function Join() {
 
 
   const getGameInfo = async () => {
-    const t = await bj.total();
     const info = await bj.listGames();
 
-    setTotal(t);
-
-    console.log(t)
-
-    setGames(info);
+    setTotal(info.totalGames);
+    console.log(info.gameInfo)
+    setGames(info.gameInfo);
   }
 
   const handleInput = (e)  => {
