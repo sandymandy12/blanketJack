@@ -2,6 +2,8 @@ import './Nav.css';
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { Contract } from '../scripts/contract';
+import Modal from 'react-modal';
+
 // import Blockies from "react-blockies";
 
 let network = parseInt(window.ethereum.chainId, 16);
@@ -14,11 +16,21 @@ function Game(props) {
     const [info, setInfo] = useState({});
     const [gameState, setGameState] = useState(''); // open, started, dealing, betting
     const [players, setPlayers] = useState();
+    const [buyIn, setBuyIn] = useState(1.00);
+    const [jModelOpen, setJModelOpen] = useState(false);
+
+
+    const handleInput = (e)  => {
+        setBuyIn((e.target.value));
+      }
 
     const getGameInfo = async () => {
-        const result = await bj.gameInfo(id);
-        setInfo(result);
-        console.log('Game info',info);
+        console.log('gameid-', id)
+        const info = await bj.gameInfo(id);
+        const status = await bj.status(id)
+        setInfo(info);
+        setGameState(status);
+        console.log('status', status);
     }
 
     const getPlayers = async () => {
@@ -32,9 +44,14 @@ function Game(props) {
         
     }
 
+    const getStatus = async (_id) => {
+        const status = await bj.status(id);
+        console.log(status);
+        return status;
+    }
+
     useEffect(() => {
         getGameInfo();
-        info.active ? setGameState('started') : setGameState('open');
     }, [])
 
 
@@ -56,7 +73,6 @@ function Game(props) {
     const deal = async () => {
         await getPlayers();
         await bj.deal(id, info.size);
-        setGameState('dealing')
     }
 
     const bet = async () => {
@@ -65,17 +81,18 @@ function Game(props) {
 
     return (
         <div class='game__start' id={info.id}>
-            <button class='game_button border btn-dark bg-primary ' onClick={join} hidden={gameState!=='open'}>
+            <h2>{gameState}</h2>
+            <button class='game_button border btn-dark bg-primary ' onClick={join} hidden={gameState!=='OPEN'}>
               Join
               <span id='button_value'>{info.active === true ? "(started)" : ""}</span>
             </button>
-
-            <button class='game_button border btn-dark bg-primary' onClick={start} hidden={gameState!=='open'}>
+            
+            <button class='game_button border btn-dark bg-primary' onClick={start} hidden={gameState!=='OPEN'}>
               Start
               <span id='button_value'>{info.active === true ? "(started)" : ""}</span>
             </button>
 
-            <button class='game_button border btn-dark bg-primary' onClick={deal} hidden={gameState!=='started'}>
+            <button class='game_button border btn-dark bg-primary' onClick={deal} hidden={gameState!=='DEALING'}>
               Deal
               <span id='button_value'></span>
             </button>
@@ -85,6 +102,14 @@ function Game(props) {
             </div>
         </div>
         
+    )
+}
+
+function joinModal(props) {
+    return (
+        <Modal isOpen={props.open}>
+            <h2>{props.gameId}</h2>
+        </Modal>
     )
 }
 

@@ -78,8 +78,8 @@ abstract contract Setup {
     }
     
     enum Status { OPEN, DEALING, BETTING, PAYOUT, DONE }
-    Status current;
-    Status previous;
+    Status public current;
+    Status internal previous;
 
     function addPlayer(address _addr) public{ 
         require(current == Status.OPEN, "game not open");
@@ -136,9 +136,7 @@ abstract contract Setup {
         return total;
     }
     
-    function currentStatus() external view returns(Status) {
-        return current;
-    }
+    
     function setStatus(Status _status) public {
         if (previous != current) {
             previous = current;
@@ -163,6 +161,9 @@ abstract contract Setup {
             current = previous;
         }
         return needsToRaise;
+    }
+    function checkStatus(Status _status) public view returns(bool) {
+        return current == _status;
     }
     
 }
@@ -196,6 +197,7 @@ contract Game is Setup {
         _;
     }
     
+    mapping(Status => string) statuses;
     
     constructor(address _creator) {
         admin = _creator;
@@ -212,8 +214,19 @@ contract Game is Setup {
             }
         }
         
+        statuses[Status.OPEN] = 'OPEN';
+        statuses[Status.DEALING] = 'DEALING';
+        statuses[Status.BETTING] = 'BETTING';
+        statuses[Status.PAYOUT] = 'PAYOUT';
+        statuses[Status.DONE] = 'DONE';
+        
         current = Status.OPEN;
     }
+    
+    function currentStatus() external view returns(string memory) {
+         return statuses[current];
+    }
+    
     
     function setBet(address _addr, uint _bet) external payable isMinimum(_bet) {
 
@@ -340,15 +353,17 @@ contract BlackJack {
         uint _size,
         uint _minimumBet,
         uint _balance,
-        address _admin
+        address _admin,
+        string memory _status
         ){
         uint totalBets = games[_gameIdx].totalBets();
         uint size = games[_gameIdx].size();
         uint min = games[_gameIdx].getMinimum();
         uint balance = games[_gameIdx].balance();
         address admin = games[_gameIdx].viewAdmin();
+        string memory current = games[_gameIdx].currentStatus();
         
-        return (totalBets, size, min, balance, admin);
+        return (totalBets, size, min, balance, admin, current);
         
     }
     
@@ -385,8 +400,8 @@ contract BlackJack {
         game.setBet(msg.sender, msg.value);
     }
     
-    function status(uint _gameIdx) external view returns(Setup.Status _status) {
-        return games[_gameIdx].currentStatus();
+    function status(uint _gameIdx) external view returns(string memory _status) {
+        return  games[_gameIdx].currentStatus();
     }
    
     function deal(uint _gameIdx) public {
@@ -407,7 +422,7 @@ contract BlackJack {
         }
         
         require(
-            game.currentStatus() == Setup.Status.DEALING,
+            game.checkStatus(Setup.Status.DEALING) == true,
             'not dealing'
         );
         
@@ -421,5 +436,3 @@ contract BlackJack {
         
     }
 }
-
-

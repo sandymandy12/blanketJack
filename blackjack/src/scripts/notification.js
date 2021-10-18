@@ -5,6 +5,7 @@ export class Notification {
     constructor() {
         this.ids = [];
     }
+
     add(n) {
 
         let notification = {
@@ -29,9 +30,11 @@ export class Notification {
             notification
         )
 
+        /**
        if (n.id) {
         this.ids.push(n.id);
        }
+       */
 
     }
 
@@ -39,5 +42,9 @@ export class Notification {
         store.removeNotification(_id)
         const idx = this.ids.indexOf(_id);
         this.ids.pop(idx);
+    }
+
+    error(e) {
+        this.add({text: e.message, type: 'danger', title:'error'})
     }
 }

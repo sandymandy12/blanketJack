@@ -15,8 +15,8 @@ class Contract {
   constructor(network) {
     console.log('network - contract', network);
 
-    const chain = 3; // wanted to use network but its being a dickhead
-    const bjAddress = addy[chain].contract;
+    const chain = 3; // wanted to use network but it isnt working with me
+    const bjAddress = addy[network].contract;
 
     this.provider = new ethers.providers.Web3Provider(window.ethereum);
     this.signer = this.provider.getSigner();
@@ -25,6 +25,7 @@ class Contract {
       BlackJackABi,
       this.signer
     );
+
     this.address = ethers.utils.getAddress(window.ethereum.selectedAddress);
     
   }
@@ -56,17 +57,18 @@ class Contract {
       notify.add({
         text:'Creating contract\n' + String(hash),
         type:'success',
-        id: id + hash,
-        title: title
+        id: id,
+        title: title,
+        timer: true
 
       });
+
 
       console.log('done')
 
     } catch (e) {      
-      
-      notify.add({text: e.message, type: 'danger', title:'error'})
-      console.log(e.message);
+      notify.error(e);
+      console.log(e);
     }
   
   }
@@ -94,6 +96,31 @@ class Contract {
       console.log(e.message)
     }
 
+  }
+
+  async status(_id) {
+    try {
+      const status = await this.contract.status(_id);
+      const hash = await status.hash;
+
+      const title = 'create-'+ String(Date.now());
+      const id = String(hash) + String(Date.now());
+
+      notify.add({
+        text:'status contract',
+        type:'success',
+        id: id + hash,
+        title: title,
+        timer: true
+
+      });
+
+      return(status);
+
+    } catch (e) {
+      console.log(e.message);
+      notify.error(e);
+    }
   }
 
   async deal(_id, _size) {

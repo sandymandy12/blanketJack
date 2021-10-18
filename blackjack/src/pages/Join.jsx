@@ -21,17 +21,13 @@ function Join() {
 
   const [total, setTotal] = useState(0);
   const [games, setGames] = useState([]);
-  const [buyIn, setBuyIn] = useState(1.00);
+  
 
 
   const getGameInfo = async () => {
     const info = await bj.listGames();
     setTotal(info.totalGames);
     setGames(info.gameInfo);
-  }
-
-  const handleInput = (e)  => {
-    setBuyIn((e.target.value));
   }
 
 
