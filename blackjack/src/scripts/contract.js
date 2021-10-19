@@ -15,7 +15,7 @@ class Contract {
   constructor(network) {
     console.log('network - contract', network);
 
-    const chain = 3; // wanted to use network but it isnt working with me
+    // const chain = 3; // wanted to use network but it isnt working with me
     const bjAddress = addy[network].contract;
 
     this.provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -99,9 +99,15 @@ class Contract {
   }
 
   async status(_id) {
+    const statuses = { 
+      32: 'OPEN'
+    }
     try {
-      const status = await this.contract.status(_id);
+      const response = await this.contract.status(_id);
+      const status = statuses[response];
       const hash = await status.hash;
+
+      console.log('status - ', status, ', contract response');  
 
       const title = 'create-'+ String(Date.now());
       const id = String(hash) + String(Date.now());
@@ -109,7 +115,7 @@ class Contract {
       notify.add({
         text:'status contract',
         type:'success',
-        id: id + hash,
+        id: id,
         title: title,
         timer: true
 

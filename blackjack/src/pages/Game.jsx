@@ -17,10 +17,9 @@ function Game(props) {
     const [gameState, setGameState] = useState(''); // open, started, dealing, betting
     const [players, setPlayers] = useState();
     const [buyIn, setBuyIn] = useState(1.00);
-    const [jModelOpen, setJModelOpen] = useState(false);
 
 
-    const handleInput = (e)  => {
+    const handleInput = async (e)  => {
         setBuyIn((e.target.value));
       }
 
@@ -30,7 +29,6 @@ function Game(props) {
         const status = await bj.status(id)
         setInfo(info);
         setGameState(status);
-        console.log('status', status);
     }
 
     const getPlayers = async () => {
@@ -41,7 +39,7 @@ function Game(props) {
         }
 
         setPlayers(players);
-        
+
     }
 
     const getStatus = async (_id) => {
@@ -56,8 +54,9 @@ function Game(props) {
 
 
     const join = async () => {
-        await bj.join(id);
-        setGameState('open');
+        console.log('buyIN from join - ', buyIn);
+        //await bj.join(id);
+        // setGameState('open');
     }
 
     const start = async () => {
@@ -75,13 +74,14 @@ function Game(props) {
         await bj.deal(id, info.size);
     }
 
-    const bet = async () => {
-        
+    const bet = async (_amount) => {
+        await bj.bet(_amount);
     }
 
     return (
         <div class='game__start' id={info.id}>
             <h2>{gameState}</h2>
+            <input placeholder='Buy in' onChange={handleInput}/>
             <button class='game_button border btn-dark bg-primary ' onClick={join} hidden={gameState!=='OPEN'}>
               Join
               <span id='button_value'>{info.active === true ? "(started)" : ""}</span>
