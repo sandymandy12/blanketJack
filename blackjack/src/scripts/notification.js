@@ -21,7 +21,7 @@ export class Notification {
 
         if (n.timer) {
             notification.dismiss = {
-                duration: 4000,
+                duration: 2000,
                 showIcon: true
             }
         } 

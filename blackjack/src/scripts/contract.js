@@ -107,7 +107,7 @@ class Contract {
       const status = statuses[response];
       const hash = await status.hash;
 
-      console.log('status - ', status, ', contract response');  
+      console.log('status - ', response, ', contract response');  
 
       const title = 'create-'+ String(Date.now());
       const id = String(hash) + String(Date.now());

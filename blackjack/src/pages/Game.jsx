@@ -24,11 +24,16 @@ function Game(props) {
       }
 
     const getGameInfo = async () => {
-        console.log('gameid-', id)
+        console.log('gameid - ', id)
         const info = await bj.gameInfo(id);
         const status = await bj.status(id)
         setInfo(info);
         setGameState(status);
+    }
+
+    const buyInPlaceholder = () => {
+        console(buyIn)
+        return 'Buy in for ';
     }
 
     const getPlayers = async () => {
@@ -42,21 +47,15 @@ function Game(props) {
 
     }
 
-    const getStatus = async (_id) => {
-        const status = await bj.status(id);
-        console.log(status);
-        return status;
-    }
-
     useEffect(() => {
         getGameInfo();
     }, [])
 
-
     const join = async () => {
-        console.log('buyIN from join - ', buyIn);
-        //await bj.join(id);
-        // setGameState('open');
+        console.log('buyIn from join - ', buyIn);
+        await bj.join(id, buyIn);
+        const state = await bj.status(id);
+        setGameState(state);
     }
 
     const start = async () => {
@@ -80,8 +79,8 @@ function Game(props) {
 
     return (
         <div class='game__start' id={info.id}>
-            <h2>{gameState}</h2>
-            <input placeholder='Buy in' onChange={handleInput}/>
+            <h2>{gameState} | Players [ {info.size} ]</h2>
+            <input placeholder={buyInPlaceholder} onChange={handleInput}/>
             <button class='game_button border btn-dark bg-primary ' onClick={join} hidden={gameState!=='OPEN'}>
               Join
               <span id='button_value'>{info.active === true ? "(started)" : ""}</span>
@@ -105,12 +104,5 @@ function Game(props) {
     )
 }
 
-function joinModal(props) {
-    return (
-        <Modal isOpen={props.open}>
-            <h2>{props.gameId}</h2>
-        </Modal>
-    )
-}
 
 export default (Game);
