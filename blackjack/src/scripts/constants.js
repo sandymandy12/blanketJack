@@ -35,7 +35,7 @@ const Addresses = {
     busd: '0x4fabb145d64652a948d72533023f6e7a623c7c53',
   },
   3: {
-    contract: '0x79fA1F10Bc50150f08e86D5E923ee26571935fCA'
+    contract: '0xcE5781BB8a0a9F9693518739d26f489e471cabF8',
   }
 };
 
@@ -48,6 +48,12 @@ const Explorer = (network, addr) => {
   }
 
   return networks[network];
+}
+
+const old_addresses = {
+  ropsten: [
+    '0x79fA1F10Bc50150f08e86D5E923ee26571935fCA'
+  ]
 }
 
 

@@ -30,12 +30,9 @@ function Join() {
     setGames(info.gameInfo);
   }
 
-
   const createGame = async (e) => {
     await bj.create();
   }
-
-
 
   useEffect(() => {
     getGameInfo();
@@ -73,7 +70,7 @@ function gameTemplate(_game) {
       <div className='game__item' class="card-body bg-dark">
         <ul class='list-group list-group-horizontal'>
           <div className="game__item_block">
-            {blockies(network,_game.address)}
+            {blockies(network,_game.admin)}
           </div>
 
 
