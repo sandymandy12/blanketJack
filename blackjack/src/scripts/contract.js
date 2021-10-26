@@ -26,7 +26,12 @@ class Contract {
       this.signer
     );
 
-    this.address = ethers.utils.getAddress(window.ethereum.selectedAddress);
+    this.address = ethers.utils
+    .getAddress
+    window.ethereum.selectedAddress ? this.address = ethers.utils
+      .getAddress(window.ethereum.selectedAddress) : 
+      this.address = '0x0000000000000000000000';
+    
     
   }
 
@@ -73,11 +78,16 @@ class Contract {
   
   }
 
-  async join(_buyIn) {
-    let buyIn = new Bignumber(_buyIn).shiftedBy(ERC20_DECIMALS);
+  async join(_gameId, _buyIn) {
+
+    let overrides = {
+      value: ethers.utils.parseEther(String(_buyIn))
+    }
 
     try {
-      
+      const join = await this.contract.join(_gameId, overrides);
+
+      console.log(join);
     } catch (e) {
       console.log(e.message);
     }
@@ -86,9 +96,7 @@ class Contract {
   async start(_id) {
     
     try {
-      const result = await this.contract.methods
-      .startGame(_id)
-      .send({ from: this.kit.defaultAccount });
+      const result = await this.contract.start(_id);
 
       console.log(result);   
 
@@ -105,7 +113,7 @@ class Contract {
     try {
       const response = await this.contract.status(_id);
       const status = statuses[response];
-      const hash = await status.hash;
+      const hash = await response.hash;
 
       console.log('status - ', response, ', contract response');  
 
@@ -121,7 +129,7 @@ class Contract {
 
       });
 
-      return(status);
+      return(response);
 
     } catch (e) {
       console.log(e.message);
@@ -164,14 +172,14 @@ class Contract {
    * @param {Player Index} _playerIdx 
    * @returns Player address at index
    */
-  async player(_gameId, _playerIdx) {
+  async player(_gameId) {
     try {
-      const result = await this.contract
-      .getPlayer(_gameId, _playerIdx);
-
+      const result = await this.contract.players(_gameId);
       return result;
+
     } catch (e) {
       console.log(e.message);
+      notify.error(e.message);
     }
   }
 
@@ -212,7 +220,6 @@ class Contract {
       id: _id
     };
   }
-
 
 }
 
